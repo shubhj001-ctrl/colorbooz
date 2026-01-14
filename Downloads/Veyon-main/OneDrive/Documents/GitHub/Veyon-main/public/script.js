@@ -122,6 +122,34 @@ document.addEventListener("DOMContentLoaded", () => {
   const imageOverlayImg = document.getElementById("image-preview-img");
   const imageOverlayClose = document.getElementById("image-preview-close");
 
+  function showFriendNotification(username) {
+    const notification = document.createElement('div');
+    notification.className = 'friend-notification animated-slide-in';
+    notification.innerHTML = `
+      <div class="friend-notification-content">
+        <span class="friend-notification-emoji">👋</span>
+        <div class="friend-notification-text">
+          <strong>${username}</strong>
+          <p>joined your network!</p>
+        </div>
+        <button class="friend-notification-close">✕</button>
+      </div>
+    `;
+    
+    document.body.appendChild(notification);
+    
+    const timeout = setTimeout(() => {
+      notification.classList.add('animated-slide-out');
+      setTimeout(() => notification.remove(), 300);
+    }, 5000);
+    
+    notification.querySelector('.friend-notification-close').addEventListener('click', () => {
+      clearTimeout(timeout);
+      notification.classList.add('animated-slide-out');
+      setTimeout(() => notification.remove(), 300);
+    });
+  }
+
   /* ========= NOTIFICATION HELPER ========= */
   function showNotification(title, message) {
     // Play notification sound (using Web Audio API)
@@ -387,6 +415,12 @@ document.addEventListener("DOMContentLoaded", () => {
     authScreen.classList.add("hidden");
     app.classList.remove("hidden");
     socket.emit("user_online", currentUser);
+    
+    // Update sidebar greeting with user's first name
+    const sidebarGreeting = document.getElementById('sidebar-greeting');
+    const firstName = currentUser ? currentUser.split(' ')[0] : 'User';
+    sidebarGreeting.textContent = `Hi, ${firstName}`;
+    
     await loadUsers();
     loadCachedChat();
     messageInput.disabled = false;
@@ -656,8 +690,49 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function loadMessages(user) {
     try {
-      const msgs = JSON.parse(localStorage.getItem(`veyon_messages_${user}`) || "[]");
-      msgs.forEach(msg => renderMessage(msg));
+      // First load from localStorage
+      const localMsgs = JSON.parse(localStorage.getItem(`veyon_messages_${user}`) || "[]");
+      
+      // Then fetch any new messages from server that might be offline messages
+      fetch(`/api/messages/${currentUser}/${user}`, {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' }
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.ok && data.messages) {
+          const serverMsgs = data.messages;
+          
+          // Merge messages: keep local + add any from server not in local
+          const localSet = new Set(localMsgs.map(m => m.createdAt || m.timestamp));
+          const mergedMsgs = [...localMsgs];
+          
+          for (const serverMsg of serverMsgs) {
+            const msgId = serverMsg.createdAt || serverMsg.timestamp;
+            if (!localSet.has(msgId)) {
+              mergedMsgs.push(serverMsg);
+            }
+          }
+          
+          // Sort by timestamp and save
+          mergedMsgs.sort((a, b) => {
+            const aTime = new Date(a.createdAt || a.timestamp).getTime();
+            const bTime = new Date(b.createdAt || b.timestamp).getTime();
+            return aTime - bTime;
+          });
+          
+          localStorage.setItem(`veyon_messages_${user}`, JSON.stringify(mergedMsgs));
+          
+          // Clear and re-render
+          chatBox.innerHTML = '';
+          mergedMsgs.forEach(msg => renderMessage(msg));
+          chatBox.scrollTop = chatBox.scrollHeight;
+        }
+      })
+      .catch(err => console.error("Failed to fetch server messages:", err));
+      
+      // Render local messages immediately
+      localMsgs.forEach(msg => renderMessage(msg));
       unreadCounts[user] = 0;
       localStorage.setItem("veyon_unread", JSON.stringify(unreadCounts));
       renderUserList(allUsers);
@@ -677,27 +752,34 @@ document.addEventListener("DOMContentLoaded", () => {
     const isOwn = msg.from === currentUser;
     const div = document.createElement("div");
     div.className = `message ${isOwn ? "own" : ""}`;
-    div.dataset.ts = msg.timestamp;
+    // Use createdAt as unique identifier
+    const msgId = msg.createdAt || msg.timestamp || Date.now();
+    div.dataset.msgid = msgId;
     div.dataset.from = msg.from;
     div.dataset.to = msg.to;
     div.dataset.text = msg.text || '';
+    
+    const msgTime = new Date(msg.createdAt || msg.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+    
     div.innerHTML = `
-      <div class="message-bubble">
-        ${msg.reply ? `<div class="reply-indicator">Replying to ${msg.reply.from}</div>` : ''}
-        ${msg.file ? `<img class="message-image" src="${msg.file}" alt="image">` : ''}
+      <div class="message-bubble ${msg.replyTo ? 'replied-to' : ''}">
+        ${msg.replyTo ? `<div class="reply-indicator">↩️ Replying to ${msg.replyTo.from}: ${msg.replyTo.text.substring(0, 30)}...</div>` : ''}
+        ${msg.media ? `<img class="message-image" src="${msg.media}" alt="image">` : ''}
         <div>${escapeHtml(msg.text)}</div>
-        <div class="message-time">${new Date(msg.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</div>
+        <div class="message-time">${msgTime}</div>
         <div class="message-reactions"></div>
       </div>
     `;
+    
     // Context menu for message actions (react/reply/copy)
     div.addEventListener('contextmenu', (e) => {
       e.preventDefault();
-      selectedMessageTimestamp = msg.timestamp;
+      selectedMessageTimestamp = msgId;
       messageMenu.style.left = `${e.pageX}px`;
       messageMenu.style.top = `${e.pageY}px`;
       messageMenu.classList.remove('hidden');
     });
+    
     chatBox.appendChild(div);
     
     // Add image preview click handler
@@ -705,7 +787,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (imgElement) {
       imgElement.addEventListener('click', (e) => {
         e.stopPropagation();
-        imageOverlayImg.src = msg.file;
+        imageOverlayImg.src = msg.media;
         imageOverlay.classList.remove("hidden");
       });
       imgElement.style.cursor = 'pointer';
@@ -768,16 +850,43 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Media upload
   mediaBtn.addEventListener("click", () => mediaInput.click());
-  mediaInput.addEventListener("change", (e) => {
+  mediaInput.addEventListener("change", async (e) => {
     const file = e.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        selectedMedia = event.target.result;
-        mediaPreviewImg.src = selectedMedia;
-        mediaPreview.classList.add("show");
-      };
-      reader.readAsDataURL(file);
+    if (!file) return;
+
+    if (file.size > 50 * 1024 * 1024) {
+      alert("File size must be under 50MB");
+      mediaInput.value = "";
+      return;
+    }
+
+    try {
+      mediaPreviewImg.style.opacity = "0.5";
+      mediaPreviewImg.src = "";
+      mediaPreview.classList.add("show");
+
+      const formData = new FormData();
+      formData.append("file", file);
+
+      const response = await fetch("/upload", {
+        method: "POST",
+        body: formData
+      });
+
+      const data = await response.json();
+      if (!data.ok) throw new Error("Upload failed");
+
+      selectedMedia = data.url;
+      mediaPreviewImg.src = data.url;
+      mediaPreviewImg.style.opacity = "1";
+
+      console.log("✅ Image uploaded:", data.url);
+    } catch (err) {
+      console.error("Upload error:", err);
+      alert("Failed to upload image: " + err.message);
+      mediaPreview.classList.remove("show");
+      selectedMedia = null;
+      mediaInput.value = "";
     }
   });
 
@@ -827,6 +936,13 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
+  socket.on("friendJoined", (data) => {
+    console.log("✅ Friend joined:", data.username);
+    loadUsers();
+    showFriendNotification(data.username);
+    showNotification(`${data.username} joined!`, `${data.username} is now in your network`);
+  });
+
   // Message input typing indicator
   messageInput.addEventListener("input", () => {
     if (!currentChat) return;  // Only send typing indicator if chatting with someone
@@ -854,7 +970,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!action) return;
     const ts = selectedMessageTimestamp;
     if (!ts) return;
-    const msgDiv = document.querySelector(`[data-ts="${ts}"]`);
+    const msgDiv = document.querySelector(`[data-msgid="${ts}"]`);
     if (!msgDiv) return;
 
     if (action === 'copy') {
@@ -863,10 +979,17 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     if (action === 'reply') {
-      replyTarget = { from: msgDiv.dataset.from, text: msgDiv.dataset.text };
+      replyTarget = { 
+        from: msgDiv.dataset.from, 
+        text: msgDiv.dataset.text,
+        timestamp: ts
+      };
+      replyPreview.classList.add('show');
       replyPreview.classList.remove('hidden');
       replyUser.textContent = replyTarget.from;
-      replyText.textContent = replyTarget.text;
+      replyText.textContent = replyTarget.text.substring(0, 50);
+      messageMenu.classList.add('hidden');
+      return;
     }
 
     if (action === 'react') {
@@ -880,12 +1003,12 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   // Reaction picker clicks
-  reactionPicker.querySelectorAll('.reaction-emoji').forEach(btn => {
+  document.querySelectorAll('.reaction-emoji').forEach(btn => {
     btn.addEventListener('click', (ev) => {
       ev.stopPropagation();
       const emoji = btn.dataset.emoji;
       const ts = selectedMessageTimestamp;
-      const msgDiv = document.querySelector(`[data-ts="${ts}"]`);
+      const msgDiv = document.querySelector(`[data-msgid="${ts}"]`);
       if (!msgDiv) return;
       const to = (msgDiv.dataset.from === currentUser) ? msgDiv.dataset.to : msgDiv.dataset.from;
       socket.emit('react', { msgId: ts, emoji, from: currentUser, to });
@@ -896,7 +1019,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // Incoming reactions
   socket.on('reaction', (payload) => {
     try {
-      const msgDiv = document.querySelector(`[data-ts="${payload.msgId}"]`);
+      const msgDiv = document.querySelector(`[data-msgid="${payload.msgId}"]`);
       if (!msgDiv) return;
       let rArea = msgDiv.querySelector('.message-reactions');
       if (!rArea) {

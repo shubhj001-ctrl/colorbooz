@@ -627,6 +627,70 @@ html, body {
   font-size: 16px;
 }
 
+.welcome-screen {
+  text-align: center;
+  animation: welcomeFadeIn 0.8s ease-out;
+}
+
+.welcome-text-up {
+  font-size: 18px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  margin-bottom: 8px;
+  animation: welcomeSlideUp 0.6s ease-out 0.1s both;
+  letter-spacing: 2px;
+}
+
+.welcome-text-veyon {
+  font-size: 72px;
+  font-weight: 700;
+  background: linear-gradient(135deg, var(--accent) 0%, #60a5fa 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  font-style: italic;
+  margin-bottom: 16px;
+  animation: welcomeScaleIn 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) 0.2s both;
+  font-family: 'Georgia', serif;
+}
+
+.welcome-subtext {
+  font-size: 14px;
+  color: var(--text-secondary);
+  animation: welcomeFadeIn 0.6s ease-out 0.4s both;
+}
+
+@keyframes welcomeSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes welcomeScaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes welcomeFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
 /* CHAT HEADER */
 .chat-header {
   padding: 16px 20px;
@@ -1030,16 +1094,6 @@ html, body {
   background: var(--surface-light);
   transform: scale(1.15);
 }
-  transition: var(--transition);
-}
-
-.send-btn:hover {
-  transform: translateY(-2px);
-}
-
-.send-btn:active {
-  transform: translateY(0);
-}
 
 /* MESSAGE CONTEXT MENU */
 .message-menu {
@@ -1242,6 +1296,104 @@ html, body {
 
 .hidden {
   display: none !important;
+}
+
+/* Friend Notification */
+.friend-notification {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: white;
+  padding: 16px 20px;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(16, 185, 129, 0.3);
+  z-index: 9998;
+  max-width: 350px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.friend-notification-content {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 14px;
+}
+
+.friend-notification-emoji {
+  font-size: 24px;
+  animation: bounce 0.6s ease-in-out infinite;
+}
+
+.friend-notification-text {
+  flex: 1;
+}
+
+.friend-notification-text strong {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 2px;
+}
+
+.friend-notification-text p {
+  margin: 0;
+  opacity: 0.9;
+  font-size: 13px;
+}
+
+.friend-notification-close {
+  background: rgba(255, 255, 255, 0.2);
+  border: none;
+  color: white;
+  width: 24px;
+  height: 24px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: all 0.2s;
+}
+
+.friend-notification-close:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.animated-slide-in {
+  animation: slideInRight 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.animated-slide-out {
+  animation: slideOutRight 0.3s ease-in-out;
+}
+
+@keyframes slideInRight {
+  from {
+    transform: translateX(400px);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slideOutRight {
+  from {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateX(400px);
+    opacity: 0;
+  }
+}
+
+@media (max-width: 600px) {
+  .friend-notification {
+    top: 10px;
+    right: 10px;
+    left: 10px;
+    max-width: none;
+  }
 }
 
 

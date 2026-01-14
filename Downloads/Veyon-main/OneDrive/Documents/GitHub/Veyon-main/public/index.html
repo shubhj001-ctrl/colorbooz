@@ -148,7 +148,7 @@
 <div id="app" class="hidden">
   <aside class="sidebar">
     <div class="sidebar-header">
-      <h2>Veyon</h2>
+      <h2 id="sidebar-greeting">Veyon</h2>
     </div>
 
     <div class="sidebar-search">
@@ -178,7 +178,13 @@
       <div id="chat-system-time" class="chat-system-time"></div>
     </header>
 
-    <div id="empty-chat" class="empty-chat">Select a chat to start messaging</div>
+    <div id="empty-chat" class="empty-chat">
+      <div class="welcome-screen">
+        <div class="welcome-text-up">Welcome To</div>
+        <div class="welcome-text-veyon">Veyon</div>
+        <div class="welcome-subtext">Select a chat to start messaging</div>
+      </div>
+    </div>
 
     <div class="chat-messages" id="chat-box">
       <div id="typing-bubble" class="typing-bubble hidden">

@@ -504,6 +504,22 @@ app.post("/api/messages/save", async (req, res) => {
   }
 });
 
+// Get messages between two users
+app.get("/api/messages/:user1/:user2", async (req, res) => {
+  try {
+    const { user1, user2 } = req.params;
+    if (!user1 || !user2) {
+      return res.status(400).json({ ok: false, error: "Missing users" });
+    }
+    const key = [user1, user2].sort().join("|");
+    const messages = await loadMessages(key);
+    return res.json({ ok: true, messages: messages || [] });
+  } catch (err) {
+    console.error("❌ Fetch messages error:", err);
+    return res.status(500).json({ ok: false, error: "Server error" });
+  }
+});
+
 /* =========================
    SOCKET STATE
 ========================= */
@@ -647,25 +663,41 @@ socket.on("sendMessage", async msg => {
   const key = chatKey(msg.from, msg.to);
   msg.createdAt = Date.now();
 
-  // ✅ 1. EMIT TO ONLINE USER (immediately)
+  // ✅ EMIT TO SENDER FIRST (immediate feedback)
+  socket.emit("message", msg);
+
+  // ✅ EMIT TO ONLINE RECIPIENT
   const recipientSocket = userSockets.get(msg.to);
   if (recipientSocket) {
     recipientSocket.emit("message", msg);
   } else {
-    // ✅ 2. STORE FOR OFFLINE USER
     if (!offlineMessages.has(msg.to)) {
       offlineMessages.set(msg.to, []);
     }
     offlineMessages.get(msg.to).push(msg);
   }
 
-  // ✅ 3. EMIT TO SENDER (confirmation)
-  userSockets.get(msg.from)?.emit("message", msg);
-
-  // ✅ 4. SAVE IN BACKGROUND (NON-BLOCKING)
   saveMessage(msg, key).catch(err => {
     console.error("❌ Message save failed:", err.message);
   });
+});
+
+/* ---------- FRIEND JOINED ---------- */
+socket.on("acceptInviteCode", async (data) => {
+  if (!data?.username || !data?.friendUsername) return;
+
+  const username = data.username;
+  const friendUsername = data.friendUsername;
+
+  const friendSocket = userSockets.get(friendUsername);
+  if (friendSocket) {
+    friendSocket.emit("friendJoined", {
+      username: username,
+      timestamp: new Date().toISOString(),
+      message: `${username} just joined your network!`
+    });
+    console.log(`✅ Notified ${friendUsername}: ${username} joined network`);
+  }
 });
 
   /* ---------- DISCONNECT ---------- */
