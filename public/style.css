@@ -1234,4 +1234,102 @@ html, body {
   display: none !important;
 }
 
+/* Friend Notification */
+.friend-notification {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: white;
+  padding: 16px 20px;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(16, 185, 129, 0.3);
+  z-index: 9998;
+  max-width: 350px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.friend-notification-content {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 14px;
+}
+
+.friend-notification-emoji {
+  font-size: 24px;
+  animation: bounce 0.6s ease-in-out infinite;
+}
+
+.friend-notification-text {
+  flex: 1;
+}
+
+.friend-notification-text strong {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 2px;
+}
+
+.friend-notification-text p {
+  margin: 0;
+  opacity: 0.9;
+  font-size: 13px;
+}
+
+.friend-notification-close {
+  background: rgba(255, 255, 255, 0.2);
+  border: none;
+  color: white;
+  width: 24px;
+  height: 24px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: all 0.2s;
+}
+
+.friend-notification-close:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.animated-slide-in {
+  animation: slideInRight 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.animated-slide-out {
+  animation: slideOutRight 0.3s ease-in-out;
+}
+
+@keyframes slideInRight {
+  from {
+    transform: translateX(400px);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slideOutRight {
+  from {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateX(400px);
+    opacity: 0;
+  }
+}
+
+@media (max-width: 600px) {
+  .friend-notification {
+    top: 10px;
+    right: 10px;
+    left: 10px;
+    max-width: none;
+  }
+}
+
 
