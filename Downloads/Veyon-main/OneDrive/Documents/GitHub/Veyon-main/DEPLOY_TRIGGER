@@ -1,0 +1,13 @@
+Deployment Trigger - Force Fresh Build
+Version: 1.0.1
+Timestamp: 2026-01-15T04:23:10Z
+
+Changes:
+- Fix context menu actions (copy/reply/react)
+- Display reply preview in chat messages
+- Load offline messages on login
+- Animated welcome screen with "Welcome To Veyon"
+- Sidebar greeting shows "Hi, USERNAME"
+- Message retrieval endpoint added
+
+Ready for production deployment!
