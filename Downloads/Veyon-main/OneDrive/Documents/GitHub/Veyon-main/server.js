@@ -354,6 +354,58 @@ app.get('/api/users/:username/connections', async (req, res) => {
   }
 });
 
+// Remove connection (unfriend)
+app.post('/api/users/:username/remove-connection', async (req, res) => {
+  try {
+    const { username } = req.params;
+    const { friend } = req.body;
+    
+    if (!username || !friend) {
+      return res.status(400).json({ ok: false, msg: 'Username and friend required' });
+    }
+    
+    const USERS = await loadUsers();
+    
+    if (!USERS[username]) {
+      return res.status(404).json({ ok: false, msg: 'User not found' });
+    }
+    
+    if (!USERS[friend]) {
+      return res.status(404).json({ ok: false, msg: 'Friend not found' });
+    }
+    
+    // Get user object
+    let userObj = typeof USERS[username] === 'string' 
+      ? { password: USERS[username], connections: [] }
+      : USERS[username];
+    
+    // Get friend object
+    let friendObj = typeof USERS[friend] === 'string'
+      ? { password: USERS[friend], connections: [] }
+      : USERS[friend];
+    
+    // Ensure connections arrays exist
+    if (!userObj.connections) userObj.connections = [];
+    if (!friendObj.connections) friendObj.connections = [];
+    
+    // Remove from both users' connections
+    userObj.connections = userObj.connections.filter(c => c !== friend);
+    friendObj.connections = friendObj.connections.filter(c => c !== username);
+    
+    // Update users
+    USERS[username] = userObj;
+    USERS[friend] = friendObj;
+    
+    await saveUsers(USERS);
+    
+    console.log(`✅ Removed connection: ${username} <-> ${friend}`);
+    return res.json({ ok: true, msg: 'Friend removed successfully' });
+  } catch (err) {
+    console.error('❌ Remove connection error:', err);
+    return res.status(500).json({ ok: false, msg: 'Server error' });
+  }
+});
+
 // Get or ensure invite code for a user (returns invite code)
 app.get('/api/users/:username/invite', async (req, res) => {
   try {

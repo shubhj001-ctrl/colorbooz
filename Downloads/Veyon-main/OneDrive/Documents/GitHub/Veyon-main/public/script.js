@@ -103,6 +103,8 @@ document.addEventListener("DOMContentLoaded", () => {
   const sendBtn = document.getElementById("send-btn");
   const mediaBtn = document.getElementById("media-btn");
   const mediaInput = document.getElementById("media-input");
+  const emojiBtn = document.getElementById("emoji-btn");
+  const emojiPicker = document.getElementById("emoji-picker");
   
   const replyPreview = document.getElementById("reply-preview");
   const replyUser = document.getElementById("reply-user");
@@ -345,6 +347,30 @@ document.addEventListener("DOMContentLoaded", () => {
     window.location.href = "/admin-login.html";
   });
 
+  /* ========= EMOJI PICKER ========= */
+  emojiBtn.addEventListener("click", (e) => {
+    e.stopPropagation();
+    emojiPicker.classList.toggle("hidden");
+  });
+
+  // Close emoji picker when clicking outside
+  document.addEventListener("click", (e) => {
+    if (!emojiPicker.contains(e.target) && e.target !== emojiBtn) {
+      emojiPicker.classList.add("hidden");
+    }
+  });
+
+  // Insert emoji into message input
+  document.querySelectorAll(".emoji-item").forEach(btn => {
+    btn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      const emoji = btn.dataset.emoji;
+      messageInput.value += emoji;
+      messageInput.focus();
+      emojiPicker.classList.add("hidden");
+    });
+  });
+
   /* ========= ENHANCEMENTS: ENTER TO SEND & MOBILE ACTIONS ========= */
 
   // Enter key to send message (without Shift)
@@ -535,6 +561,41 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
+  async function removeFriend(friendUsername) {
+    try {
+      const res = await fetch(`/api/users/${currentUser}/remove-connection`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ friend: friendUsername })
+      });
+      
+      const data = await res.json();
+      if (data.ok) {
+        // Remove from local list
+        allUsers = allUsers.filter(u => u !== friendUsername);
+        renderUserList(allUsers);
+        
+        // Clear chat if currently viewing removed friend
+        if (currentChat === friendUsername) {
+          currentChat = null;
+          chatBox.innerHTML = "";
+          emptyChat.style.display = "flex";
+          chatFooter.classList.add("hidden");
+        }
+        
+        // Clear local messages
+        localStorage.removeItem(`veyon_messages_${friendUsername}`);
+        
+        alert(`${friendUsername} has been removed from your friends`);
+      } else {
+        alert(data.msg || 'Failed to remove friend');
+      }
+    } catch (err) {
+      console.error("Failed to remove friend:", err);
+      alert('Error removing friend');
+    }
+  }
+
   function renderUserList(users) {
     userList.innerHTML = users.map(user => {
       const unread = unreadCounts[user] || 0;
@@ -550,12 +611,29 @@ document.addEventListener("DOMContentLoaded", () => {
             <div class="user-message">${lastMsgText.substring(0, 30)}</div>
           </div>
           ${unread > 0 ? `<div class="user-unread">${unread}</div>` : ''}
+          <button class="remove-friend-btn" data-user="${user}" title="Remove friend">✕</button>
         </div>
       `;
     }).join("");
     
     document.querySelectorAll(".user-item").forEach(item => {
-      item.addEventListener("click", () => selectUser(item.dataset.user));
+      item.addEventListener("click", (e) => {
+        // Don't select user if clicking remove button
+        if (!e.target.classList.contains('remove-friend-btn')) {
+          selectUser(item.dataset.user);
+        }
+      });
+    });
+    
+    // Add remove friend event listeners
+    document.querySelectorAll(".remove-friend-btn").forEach(btn => {
+      btn.addEventListener("click", async (e) => {
+        e.stopPropagation();
+        const friendToRemove = btn.dataset.user;
+        if (confirm(`Remove ${friendToRemove} from your friends?`)) {
+          await removeFriend(friendToRemove);
+        }
+      });
     });
   }
 

@@ -498,6 +498,7 @@ html, body {
   display: flex;
   align-items: center;
   gap: 12px;
+  position: relative;
 }
 
 .user-item:hover {
@@ -556,6 +557,33 @@ html, body {
   font-weight: 700;
   color: white;
   flex-shrink: 0;
+}
+
+.remove-friend-btn {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid var(--danger);
+  color: var(--danger);
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  transition: var(--transition);
+  flex-shrink: 0;
+}
+
+.user-item:hover .remove-friend-btn {
+  display: flex;
+}
+
+.remove-friend-btn:hover {
+  background: var(--danger);
+  color: white;
+  transform: scale(1.1);
 }
 
 .logout-btn-bottom {
@@ -948,6 +976,60 @@ html, body {
   align-items: center;
   justify-content: center;
   font-size: 16px;
+  transition: var(--transition);
+}
+
+.send-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+}
+
+.emoji-btn-custom {
+  font-size: 18px;
+}
+
+.emoji-picker {
+  position: absolute;
+  bottom: 60px;
+  right: 60px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 12px;
+  box-shadow: var(--shadow);
+  z-index: 1000;
+  max-width: 280px;
+  animation: fadeIn 0.2s ease;
+}
+
+.emoji-picker.hidden {
+  display: none;
+}
+
+.emoji-grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 8px;
+}
+
+.emoji-item {
+  width: 36px;
+  height: 36px;
+  border: none;
+  background: var(--background);
+  border-radius: 8px;
+  font-size: 20px;
+  cursor: pointer;
+  transition: var(--transition);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.emoji-item:hover {
+  background: var(--surface-light);
+  transform: scale(1.15);
+}
   transition: var(--transition);
 }
 
