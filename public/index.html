@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Veyon</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<!-- LOADING SCREEN -->
+<div id="loading-screen">
+  <div class="loading-box">
+    <div class="loading-veyon-container">
+      <svg class="veyon-svg" viewBox="0 0 500 120" preserveAspectRatio="xMidYMid meet">
+        <!-- Define the fill pattern that will be animated -->
+        <defs>
+          <linearGradient id="fillGradient" x1="0%" y1="100%" x2="0%" y2="0%">
+            <stop offset="0%" style="stop-color:#3b82f6;stop-opacity:1" />
+            <stop offset="100%" style="stop-color:#2563eb;stop-opacity:1" />
+          </linearGradient>
+          <clipPath id="textClip">
+            <text x="50%" y="85" text-anchor="middle" font-size="90" font-weight="700" font-family="system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif">VEYON</text>
+          </clipPath>
+        </defs>
+        
+        <!-- Background text (outline) -->
+        <text x="50%" y="85" text-anchor="middle" font-size="90" font-weight="700" font-family="system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" fill="none" stroke="#334155" stroke-width="2" opacity="0.5">VEYON</text>
+        
+        <!-- Filled water effect (animated) -->
+        <rect id="fillRect" x="50" y="40" width="0" height="90" fill="url(#fillGradient)" clip-path="url(#textClip)"></rect>
+      </svg>
+    </div>
+    <div class="loading-info">
+      <div class="ping-display"><span id="ping-value">Initializing</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- MESSAGE CONTEXT MENU -->
+<div id="message-menu" class="message-menu hidden">
+  <button class="menu-item" data-action="react">😊 React</button>
+  <button class="menu-item" data-action="reply">↩️ Reply</button>
+  <button class="menu-item" data-action="copy">📋 Copy</button>
+</div>
+
+<!-- REACTION PICKER -->
+<div id="reaction-picker" class="reaction-picker hidden">
+  <button class="reaction-emoji" data-emoji="😊">😊</button>
+  <button class="reaction-emoji" data-emoji="❤️">❤️</button>
+  <button class="reaction-emoji" data-emoji="😂">😂</button>
+  <button class="reaction-emoji" data-emoji="🔥">🔥</button>
+  <button class="reaction-emoji" data-emoji="👍">👍</button>
+  <button class="reaction-emoji" data-emoji="👎">👎</button>
+  <button class="reaction-emoji" data-emoji="😢">😢</button>
+  <button class="reaction-emoji" data-emoji="🎉">🎉</button>
+</div>
+
+<!-- AUTH SCREEN -->
+<div id="auth-screen">
+  <!-- LOGIN VIEW -->
+  <div id="login-view" class="auth-view active">
+    <div class="auth-container">
+      <div class="auth-header">
+        <h1>Veyon</h1>
+        <p>Secure Messaging Platform</p>
+      </div>
+
+      <form id="login-form" class="auth-form">
+        <div class="form-group">
+          <input type="text" id="login-username" placeholder="Username" autocomplete="off" required>
+        </div>
+        <div class="form-group">
+          <input type="password" id="login-password" placeholder="Password" autocomplete="off" required>
+        </div>
+        <button type="submit" id="login-btn" class="auth-btn">Sign In</button>
+      </form>
+
+      <div class="auth-divider">Don't have an account?</div>
+
+      <button id="switch-to-register" class="auth-link-btn">Create New Account</button>
+
+      <div class="admin-section">
+        <button id="core-login-btn" class="admin-btn">Admin Portal</button>
+      </div>
+
+      <p id="login-error" class="auth-error hidden"></p>
+    </div>
+  </div>
+
+  <!-- REGISTRATION VIEW -->
+  <div id="register-view" class="auth-view hidden">
+    <div class="auth-container">
+      <div class="auth-header">
+        <h1>Create Account</h1>
+        <p>Join Veyon Community</p>
+      </div>
+
+      <!-- Registration Form (All-in-one) -->
+      <form class="auth-form" id="registration-form">
+        <!-- First Name -->
+        <div class="form-group">
+          <input type="text" id="register-firstName" placeholder="First Name" autocomplete="off" required>
+        </div>
+
+        <!-- Last Name -->
+        <div class="form-group">
+          <input type="text" id="register-lastName" placeholder="Last Name" autocomplete="off" required>
+        </div>
+
+        <!-- Email -->
+        <div class="form-group">
+          <input type="email" id="register-email" placeholder="Email Address" autocomplete="off" required>
+        </div>
+
+        <!-- Phone Number -->
+        <div class="form-group">
+          <input type="tel" id="register-phone" placeholder="Phone Number (optional)" autocomplete="off">
+        </div>
+
+        <!-- Password -->
+        <div class="form-group" id="password-input-group">
+          <div class="password-input-wrapper">
+            <input type="password" id="register-password" placeholder="Password (min 6 chars)" autocomplete="off" required>
+            <button type="button" class="password-toggle" id="password-toggle-1">👁</button>
+          </div>
+        </div>
+
+        <!-- Confirm Password -->
+        <div class="form-group" id="confirm-password-input-group">
+          <div class="password-input-wrapper">
+            <input type="password" id="register-password-confirm" placeholder="Confirm Password" autocomplete="off" required>
+            <button type="button" class="password-toggle" id="password-toggle-2">👁</button>
+          </div>
+        </div>
+
+        <!-- Status Message -->
+        <p id="registration-message" class="auth-message"></p>
+
+        <!-- Submit Button -->
+        <button type="submit" id="create-account-btn" class="auth-btn">Create Account</button>
+      </form>
+
+      <button id="switch-to-login" class="auth-link-btn">Back to Login</button>
+    </div>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app" class="hidden">
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <h2>Veyon</h2>
+    </div>
+
+    <div class="sidebar-search">
+      <input type="text" id="user-search" placeholder="Search users..." class="search-input"/>
+    </div>
+
+    <div class="user-list" id="user-list"></div>
+
+    <button id="logout-btn" class="logout-btn-bottom" title="Logout">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+        <polyline points="16 17 21 12 16 7"></polyline>
+        <line x1="21" y1="12" x2="9" y2="12"></line>
+      </svg>
+    </button>
+  </aside>
+
+  <main class="chat-area">
+    <header class="chat-header">
+      <button id="back-btn" class="mobile-only">←</button>
+      <div class="chat-header-user">
+        <div class="chat-avatar"><span id="chat-avatar-letter">?</span></div>
+        <div class="chat-user-meta">
+          <div id="chat-title" class="chat-username">Select a chat</div>
+        </div>
+      </div>
+      <div id="chat-system-time" class="chat-system-time"></div>
+    </header>
+
+    <div id="empty-chat" class="empty-chat">Select a chat to start messaging</div>
+
+    <div class="chat-messages" id="chat-box">
+      <div id="typing-bubble" class="typing-bubble hidden">
+        <span class="dot"></span>
+        <span class="dot"></span>
+        <span class="dot"></span>
+      </div>
+    </div>
+
+    <footer class="chat-input hidden" id="chat-footer">
+      <div id="reply-preview" class="reply-preview hidden">
+        <div class="reply-line"></div>
+        <div class="reply-content">
+          <span id="reply-user"></span>
+          <span id="reply-text"></span>
+        </div>
+        <button id="cancel-reply">✕</button>
+      </div>
+
+      <div id="media-preview" class="media-preview hidden">
+        <img id="media-preview-img" />
+        <button id="remove-media">✕</button>
+      </div>
+
+      <div class="chat-input-row">
+        <button id="media-btn" class="icon-btn media-btn-custom">
+          <svg class="upload-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+            <polyline points="17 8 12 3 7 8"></polyline>
+            <line x1="12" y1="3" x2="12" y2="15"></line>
+          </svg>
+        </button>
+
+        <input id="message-input" placeholder="Type a message" disabled/>
+        
+        <button id="emoji-btn" class="icon-btn emoji-btn-custom">😊</button>
+        <button id="send-btn" class="send-btn">➤</button>
+      </div>
+
+      <!-- Emoji Picker Dropdown -->
+      <div id="emoji-picker" class="emoji-picker hidden">
+        <div class="emoji-grid">
+          <button class="emoji-item" data-emoji="😊">😊</button>
+          <button class="emoji-item" data-emoji="😂">😂</button>
+          <button class="emoji-item" data-emoji="😍">😍</button>
+          <button class="emoji-item" data-emoji="🥰">🥰</button>
+          <button class="emoji-item" data-emoji="😎">😎</button>
+          <button class="emoji-item" data-emoji="😢">😢</button>
+          <button class="emoji-item" data-emoji="😭">😭</button>
+          <button class="emoji-item" data-emoji="😡">😡</button>
+          <button class="emoji-item" data-emoji="🤔">🤔</button>
+          <button class="emoji-item" data-emoji="😴">😴</button>
+          <button class="emoji-item" data-emoji="🤗">🤗</button>
+          <button class="emoji-item" data-emoji="🤩">🤩</button>
+          <button class="emoji-item" data-emoji="👍">👍</button>
+          <button class="emoji-item" data-emoji="👎">👎</button>
+          <button class="emoji-item" data-emoji="👏">👏</button>
+          <button class="emoji-item" data-emoji="🙏">🙏</button>
+          <button class="emoji-item" data-emoji="❤️">❤️</button>
+          <button class="emoji-item" data-emoji="💔">💔</button>
+          <button class="emoji-item" data-emoji="🔥">🔥</button>
+          <button class="emoji-item" data-emoji="⭐">⭐</button>
+          <button class="emoji-item" data-emoji="🎉">🎉</button>
+          <button class="emoji-item" data-emoji="🎊">🎊</button>
+          <button class="emoji-item" data-emoji="🎈">🎈</button>
+          <button class="emoji-item" data-emoji="🎁">🎁</button>
+        </div>
+      </div>
+
+      <input type="file" id="media-input" accept="image/*,video/*" hidden/>
+    </footer>
+  </main>
+</div>
+
+<script src="/socket.io/socket.io.js"></script>
+<script src="script.js"></script>
+
+<!-- IMAGE PREVIEW OVERLAY -->
+<div id="image-preview-overlay" class="image-preview-overlay hidden">
+  <button class="image-preview-close" id="image-preview-close">✕</button>
+  <img id="image-preview-img" />
+</div>
+
+</body>
+</html>
