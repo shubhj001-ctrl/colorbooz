@@ -1,6 +1,6 @@
 {
   "name": "veyon",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Veyon chat application",
   "main": "server.js",
   "scripts": {
