@@ -1,0 +1,30 @@
+{
+  "admin": "admin123",
+  "user1": "password1",
+  "user2": "password2",
+  "shubham": {
+    "password": "jaggibaba",
+    "email": "shubhamjaggi44@gmail.com",
+    "status": "active",
+    "inviteToken": "f31039fc-0a45-4e69-adb5-51c02675160f",
+    "connections": [
+      "shubham"
+    ]
+  },
+  "chirag": {
+    "password": "jaggibaba",
+    "email": "chiragtest@gmail.com",
+    "status": "active",
+    "inviteToken": "cfd65df6-7548-42c5-84e2-249250af8476",
+    "connections": []
+  },
+  "baby": {
+    "password": "jaggibaba",
+    "email": "",
+    "status": "active",
+    "inviteToken": "bbe08bda-ef10-4b8a-9af8-447456266ecd",
+    "connections": [
+      "baby"
+    ]
+  }
+}

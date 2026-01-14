@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Login - VEYON</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .login-container {
+      background: white;
+      border-radius: 20px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      width: 100%;
+      max-width: 400px;
+      padding: 40px;
+      animation: slideIn 0.6s ease-out;
+    }
+
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateY(-20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .logo {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    .logo h1 {
+      font-size: 32px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      font-weight: 700;
+      letter-spacing: 2px;
+    }
+
+    .logo p {
+      color: #999;
+      font-size: 14px;
+      margin-top: 5px;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    label {
+      display: block;
+      font-size: 14px;
+      font-weight: 600;
+      color: #333;
+      margin-bottom: 8px;
+    }
+
+    input {
+      width: 100%;
+      padding: 12px 15px;
+      border: 2px solid #e0e0e0;
+      border-radius: 8px;
+      font-size: 14px;
+      transition: all 0.3s ease;
+    }
+
+    input:focus {
+      outline: none;
+      border-color: #667eea;
+      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+
+    .submit-btn {
+      width: 100%;
+      padding: 12px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      margin-top: 10px;
+    }
+
+    .submit-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+    }
+
+    .submit-btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .error-message {
+      color: #e74c3c;
+      font-size: 13px;
+      margin-top: 10px;
+      padding: 10px;
+      background: #fadbd8;
+      border-radius: 5px;
+      display: none;
+    }
+
+    .error-message.show {
+      display: block;
+    }
+
+    .back-link {
+      text-align: center;
+      margin-top: 20px;
+    }
+
+    .back-link a {
+      color: #667eea;
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 500;
+      transition: color 0.3s ease;
+    }
+
+    .back-link a:hover {
+      color: #764ba2;
+    }
+
+    .info-text {
+      background: #e3f2fd;
+      border-left: 4px solid #667eea;
+      padding: 12px;
+      border-radius: 4px;
+      font-size: 13px;
+      color: #1565c0;
+      margin-bottom: 20px;
+      line-height: 1.5;
+    }
+  </style>
+</head>
+<body>
+  <div class="login-container">
+    <div class="logo">
+      <h1>VEYON</h1>
+      <p>Admin Panel</p>
+    </div>
+
+    <div class="info-text">
+      Only administrators can access the admin panel. Please enter your admin credentials to proceed.
+    </div>
+
+    <form id="admin-login-form">
+      <div class="form-group">
+        <label for="admin-username">Username</label>
+        <input
+          type="text"
+          id="admin-username"
+          placeholder="Enter admin username"
+          autocomplete="off"
+          required
+        />
+      </div>
+
+      <div class="form-group">
+        <label for="admin-password">Password</label>
+        <input
+          type="password"
+          id="admin-password"
+          placeholder="Enter admin password"
+          autocomplete="off"
+          required
+        />
+      </div>
+
+      <div class="error-message" id="admin-error"></div>
+
+      <button type="submit" class="submit-btn" id="admin-submit-btn">
+        Login to Admin Panel
+      </button>
+    </form>
+
+    <div class="back-link">
+      <a href="/">Back to User Login</a>
+    </div>
+  </div>
+
+  <script>
+    const adminForm = document.getElementById("admin-login-form");
+    const adminUsername = document.getElementById("admin-username");
+    const adminPassword = document.getElementById("admin-password");
+    const adminError = document.getElementById("admin-error");
+    const adminSubmitBtn = document.getElementById("admin-submit-btn");
+
+    // Check if already logged in
+    function checkAdminAuth() {
+      const adminToken = localStorage.getItem("veyon_admin_token");
+      if (adminToken) {
+        window.location.href = "/admin.html";
+      }
+    }
+
+    checkAdminAuth();
+
+    adminForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      adminError.classList.remove("show");
+      adminError.textContent = "";
+
+      const username = adminUsername.value.trim();
+      const password = adminPassword.value;
+
+      if (!username || !password) {
+        adminError.textContent = "Please enter both username and password";
+        adminError.classList.add("show");
+        return;
+      }
+
+      adminSubmitBtn.disabled = true;
+      adminSubmitBtn.textContent = "Logging in...";
+
+      try {
+        const response = await fetch("/api/admin/login", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ username, password })
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.error || "Login failed");
+        }
+
+        // Store the admin token and redirect
+        localStorage.setItem("veyon_admin_token", data.token || "admin");
+        localStorage.setItem("veyon_admin_username", username);
+        window.location.href = "/admin.html";
+      } catch (err) {
+        adminError.textContent = err.message;
+        adminError.classList.add("show");
+      } finally {
+        adminSubmitBtn.disabled = false;
+        adminSubmitBtn.textContent = "Login to Admin Panel";
+      }
+    });
+  </script>
+</body>
+</html>
