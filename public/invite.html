@@ -1,0 +1,20 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Invite - Veyon</title>
+</head>
+<body>
+  <script>
+    // Save token to localStorage and redirect to main app
+    const params = new URLSearchParams(location.search);
+    const token = params.get('token');
+    if (token) {
+      localStorage.setItem('veyon_invite_token', token);
+    }
+    // Redirect to main app (index.html)
+    window.location.href = '/';
+  </script>
+</body>
+</html>

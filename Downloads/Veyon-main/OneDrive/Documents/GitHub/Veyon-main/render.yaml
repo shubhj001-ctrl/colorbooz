@@ -1,0 +1,15 @@
+services:
+  - type: web
+    name: veyon
+    runtime: node
+    plan: free
+    region: oregon
+    buildCommand: npm install
+    startCommand: node server.js
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: MONGO_URI
+        fromDatabase:
+          name: veyon
+          property: connectionString

@@ -4,8 +4,7 @@
   "description": "Veyon chat application",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js",
-    "build": "echo 'Build complete'"
+    "start": "node server.js"
   },
   "type": "commonjs",
   "engines": {
