@@ -31,6 +31,15 @@ function generateInviteCode() {
 
 // Middleware
 app.use(express.json());
+
+// Disable caching for static files to force fresh content
+app.use((req, res, next) => {
+  res.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0');
+  res.set('Pragma', 'no-cache');
+  res.set('Expires', '0');
+  next();
+});
+
 app.use(express.static("public"));
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
