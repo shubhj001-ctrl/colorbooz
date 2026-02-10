@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>COLORBOOZ</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <div class="app">
+    <h1>COLORBOOZ</h1>
+
+    <!-- LOGIN/REGISTER PAGE -->
+    <div id="loginRegisterPage" class="login-register-page">
+      <div class="auth-container">
+        <div class="auth-header">
+          <h1>COLORBOOZ</h1>
+          <p>Color Betting Game</p>
+        </div>
+
+        <div class="auth-tabs">
+          <button class="auth-tab-btn active" onclick="switchAuthTab('login')">🔐 Login</button>
+          <button class="auth-tab-btn" onclick="switchAuthTab('register')">📝 Register</button>
+        </div>
+
+        <!-- LOGIN TAB -->
+        <div id="loginTab" class="auth-tab active">
+          <div class="auth-form">
+            <div class="form-group">
+              <label>📱 Phone Number</label>
+              <input type="tel" id="loginPhone" placeholder="Enter your phone number" />
+            </div>
+
+            <div class="form-group">
+              <label>🔑 Password</label>
+              <input type="password" id="loginPassword" placeholder="Enter your password" />
+            </div>
+
+            <button onclick="userLogin()" class="auth-btn">Login</button>
+            <div id="loginError" class="auth-error"></div>
+          </div>
+        </div>
+
+        <!-- REGISTER TAB -->
+        <div id="registerTab" class="auth-tab">
+          <div class="auth-form">
+            <div class="form-group">
+              <label>👤 Full Name</label>
+              <input type="text" id="registerName" placeholder="Enter your full name" />
+            </div>
+
+            <div class="form-group">
+              <label>📱 Phone Number</label>
+              <input type="tel" id="registerPhone" placeholder="Enter your phone number" />
+            </div>
+
+            <div class="form-group">
+              <label>📧 Email Address</label>
+              <input type="email" id="registerEmail" placeholder="Enter your email address" />
+            </div>
+
+            <div class="form-group">
+              <label>🔑 Password</label>
+              <input type="password" id="registerPassword" placeholder="Enter password" />
+            </div>
+
+            <div class="form-group">
+              <label>🔑 Confirm Password</label>
+              <input type="password" id="registerConfirmPassword" placeholder="Confirm password" />
+            </div>
+
+            <button onclick="userRegister()" class="auth-btn">Create Account</button>
+            <div id="registerError" class="auth-error"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MAIN APP CONTAINER -->
+    <div id="mainApp" class="app-container hidden">
+      <div class="top-bar">
+        <span id="username">User: DemoUser</span>
+        <span id="wallet">Wallet: ₹5000</span>
+        <span id="betSeries"></span>
+        <div class="nav-buttons">
+          <button class="nav-btn active" onclick="switchPage('game')">🎮 Game</button>
+          <a href="referral.html" class="nav-btn" style="text-decoration: none; display: inline-flex; align-items: center; justify-content: center;">👥 Referral</a>
+          <button onclick="userLogout()" class="nav-btn logout-btn" style="background: linear-gradient(135deg, #ef4444, #dc2626); color: white; border-color: transparent;">🚪 Logout</button>
+        </div>
+        <button onclick="goToAdminLogin()">Admin</button>
+      </div>
+
+    <!-- GAME PAGE -->
+    <div id="gamePage" class="page active">
+    <div class="grid">
+        <h2>Next Round</h2>
+        <div id="timer" class="timer">30</div>
+        <div id="resultDisplay" class="result-display hidden">
+          <div class="result-label">Winning Number</div>
+          <div id="resultNumber" class="result-number"></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>📡 Live Bet Feed</h3>
+        <div id="liveBetFeed" class="live-feed">
+          <div class="feed-item">Waiting for bets...</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>🏆 Leaderboard</h3>
+        <div class="leaderboard-tabs">
+          <button class="tab-btn active" onclick="switchLeaderboard('daily')">Daily</button>
+          <button class="tab-btn" onclick="switchLeaderboard('weekly')">Weekly</button>
+          <button class="tab-btn" onclick="switchLeaderboard('alltime')">All Time</button>
+        </div>
+        <div id="leaderboard" class="leaderboard"></div>
+      </div>
+
+      <div class="card">
+        <h3>Quick Bet Amount</h3>
+        <div class="quick-bets">
+          <button class="quick-btn" onclick="setAmount(50)">₹50</button>
+          <button class="quick-btn" onclick="setAmount(100)">₹100</button>
+          <button class="quick-btn" onclick="setAmount(500)">₹500</button>
+          <button class="quick-btn" onclick="setAmount(1000)">₹1000</button>
+        </div>
+        <input type="number" id="betAmount" value="50" min="10" max="1000" />
+        <button class="green" onclick="placeBet('Green')">Green (2x)</button>
+        <button class="red" onclick="placeBet('Red')">Red (2x)</button>
+        <button class="violet" onclick="placeBet('Violet')">Violet (5x)</button>
+        
+        <h3 style="margin-top: 15px; margin-bottom: 10px;">Bet on Numbers (9x)</h3>
+        <div style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 5px;">
+          <button class="num-btn green-violet" onclick="placeNumberBet(0)">0</button>
+          <button class="num-btn green" onclick="placeNumberBet(1)">1</button>
+          <button class="num-btn red" onclick="placeNumberBet(2)">2</button>
+          <button class="num-btn green" onclick="placeNumberBet(3)">3</button>
+          <button class="num-btn red" onclick="placeNumberBet(4)">4</button>
+          <button class="num-btn red-violet" onclick="placeNumberBet(5)">5</button>
+          <button class="num-btn red" onclick="placeNumberBet(6)">6</button>
+          <button class="num-btn green" onclick="placeNumberBet(7)">7</button>
+          <button class="num-btn red" onclick="placeNumberBet(8)">8</button>
+          <button class="num-btn green" onclick="placeNumberBet(9)">9</button>
+        </div>
+        
+        <div id="activeBets" class="active-bets">
+          <h3>Active Bets</h3>
+          <div id="activeBetsList">No bets placed</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>Recent Colors</h2>
+        <div id="history" class="history"></div>
+      </div>
+    </div>
+
+    <div class="card" style="grid-column: 1 / -1;">
+      <h2>Bet History (Last 10 Rounds)</h2>
+      <div id="betHistory" class="bet-history-table">
+        <div class="history-header">
+          <span>Series</span>
+          <span>Number</span>
+          <span>Your Bets</span>
+          <span>Result</span>
+          <span>P/L</span>
+        </div>
+        <div id="betHistoryList" class="history-list">
+          No history yet
+        </div>
+      </div>
+    </div>
+    </div>
+
+    <div id="toast" class="toast hidden"></div>
+
+    </div> <!-- END mainApp -->
+
+    <!-- ADMIN LOGIN PAGE -->
+    <div id="adminLoginPage" class="admin-page hidden">
+      <div class="login-container">
+        <div class="login-wrapper">
+          <h1>COLORBOOZ</h1>
+          <h2>Admin Login</h2>
+          
+          <div class="login-form">
+            <div class="form-group">
+              <label>Username</label>
+              <input type="text" id="adminUsername" placeholder="Enter admin username" />
+            </div>
+            
+            <div class="form-group">
+              <label>Password</label>
+              <input type="password" id="adminPassword" placeholder="Enter password" />
+            </div>
+            
+            <button onclick="adminLogin()" class="login-btn">Login</button>
+            <button onclick="backToMain()" class="login-btn back-btn">Back to Game</button>
+            
+            <div id="loginError" class="login-error"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ADMIN DASHBOARD -->
+    <div id="adminDashboard" class="admin-page hidden">
+      <div class="admin-header">
+        <h1>COLORBOOZ - Admin Dashboard</h1>
+        <button onclick="adminLogout()" class="logout-btn">Logout</button>
+      </div>
+
+      <div class="admin-container">
+        <div class="admin-tabs">
+          <button class="admin-tab-btn active" onclick="switchAdminTab('weights')">Color Weights</button>
+          <button class="admin-tab-btn" onclick="switchAdminTab('accounts')">Manage Accounts</button>
+          <button class="admin-tab-btn" onclick="switchAdminTab('predictions')">Set Series Colors</button>
+        </div>
+        
+        <!-- Weights Tab -->
+        <div id="weightsTab" class="admin-tab active">
+          <h3>Adjust Color Weights</h3>
+          <label>Green <input type="number" id="wGreen" value="45" /></label>
+          <label>Red <input type="number" id="wRed" value="45" /></label>
+          <label>Violet <input type="number" id="wViolet" value="10" /></label>
+          <button onclick="updateWeights()">Update Weights</button>
+        </div>
+        
+        <!-- Accounts Tab -->
+        <div id="accountsTab" class="admin-tab">
+          <h3>Live Accounts</h3>
+          <div class="accounts-list" id="accountsList"></div>
+        </div>
+        
+        <!-- Predictions Tab -->
+        <div id="predictionsTab" class="admin-tab">
+          <h3>Set Color for Upcoming Bet Series</h3>
+          <div class="prediction-setup">
+            <div style="margin-bottom: 15px;">
+              <label style="display: block; margin-bottom: 5px;">Bet Series Number (e.g., 010)</label>
+              <input type="number" id="seriesNumber" min="1" max="999" placeholder="e.g., 010" style="padding: 8px; border-radius: 8px; border: 1px solid #374151; background: #1f2937; color: white; width: 100%;">
+            </div>
+            
+            <div style="margin-bottom: 15px;">
+              <label style="display: block; margin-bottom: 5px;">Select Winning Color</label>
+              <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;">
+                <button onclick="selectPredictionColor('Green')" class="color-select-btn green">Green (1,3,7,9)</button>
+                <button onclick="selectPredictionColor('Red')" class="color-select-btn red">Red (2,4,6,8)</button>
+                <button onclick="selectPredictionColor('Violet')" class="color-select-btn violet">Violet (0,5)</button>
+              </div>
+              <div id="selectedColorDisplay" style="margin-top: 15px; padding: 10px; background: rgba(255, 255, 255, 0.1); border-radius: 8px; text-align: center;">Select a color</div>
+            </div>
+            
+            <button onclick="savePrediction()" style="width: 100%; padding: 10px; background: #22c55e; border: none; border-radius: 8px; color: white; font-weight: bold; cursor: pointer; margin-bottom: 20px;">Save Series Color</button>
+          </div>
+          
+          <h3 style="margin-top: 30px;">Upcoming Predictions</h3>
+          <div id="predictionsList" class="predictions-list"></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
